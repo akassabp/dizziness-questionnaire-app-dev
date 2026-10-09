@@ -2,7 +2,7 @@
   "use strict";
   const defaults = window.NEBULA_DATA;
   if (!defaults) throw new Error("Questionnaire data did not load.");
-  const ACCESS_HASH = "0f7a4f8120712df5464758e375faf9829818369c774fcedb64ed7bd3b62f5ea1";
+  const ACCESS_HASH = "e0e5ea05acbf3d7596b7670337d95b51f7689c886047a4244d72cb2f144cc339";
   const RULES_KEY = "nebula-desktop-compatible-rules-v2-km2";
   const $ = (id) => document.getElementById(id);
   const clone = (value) => JSON.parse(JSON.stringify(value));
