@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Development environment for the Nebula dizziness questionnaire scoring platform." />
   <title>Nebula Questionnaire — Development</title>
-  <link rel="stylesheet" href="styles.css?v=dev-1" />
+  <link rel="stylesheet" href="styles.css?v=dev-2" />
 </head>
 <body class="auth-locked">
   <section id="access-gate" class="access-gate" aria-labelledby="access-title">
@@ -41,7 +41,6 @@
             <div class="question-status"><strong id="question-meta"></strong><span id="answer-state">Not answered</span></div>
             <h2 id="question-prompt"></h2>
             <div id="answer-options" class="answer-options"></div>
-            <div class="question-explain-row"><button id="explain-scoring" class="explain-button" type="button">How this answer affects scores</button></div>
             <div class="question-controls"><button id="previous-question">Previous</button><button id="clear-answer">Clear answer</button><span></span><button id="next-question" class="primary">Next</button></div>
           </section>
           <aside class="score-panel panel"><h2>Current category support</h2><p>These are rule-based screening scores, not diagnoses.</p><div id="score-list"></div><div id="answered-count" class="completion"></div></aside>
@@ -80,7 +79,7 @@
   </div>
   <dialog id="score-explanation" class="score-dialog" aria-labelledby="score-explanation-title">
     <div class="dialog-header">
-      <div><p class="eyebrow">Selected-answer impact</p><h2 id="score-explanation-title">How this answer affects scores</h2></div>
+      <div><p class="eyebrow">Option impact preview</p><h2 id="score-explanation-title">How this option affects scores</h2></div>
       <button id="close-score-explanation" type="button" aria-label="Close scoring explanation">Close</button>
     </div>
     <p id="score-explanation-question" class="dialog-question"></p>
@@ -89,6 +88,6 @@
     <p class="dialog-note">These are rule-based point changes from the active model configuration. They are not a diagnosis.</p>
   </dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="questionnaire-data.js?v=km2-2"></script><script src="app.js?v=dev-1"></script>
+  <script src="questionnaire-data.js?v=km2-2"></script><script src="app.js?v=dev-2"></script>
 </body>
 </html>
