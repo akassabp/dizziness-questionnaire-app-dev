@@ -29,7 +29,7 @@
   accessForm.addEventListener("submit", async (event) => { event.preventDefault(); accessError.textContent = ""; if (await sha256(accessCode.value) === ACCESS_HASH) { accessCode.value = ""; unlock(); } else { accessError.textContent = "Incorrect access code."; accessCode.select(); } });
 
   const els = {
-    list: $("question-list"), meta: $("question-meta"), answerState: $("answer-state"), prompt: $("question-prompt"), options: $("answer-options"), previous: $("previous-question"), next: $("next-question"), clearAnswer: $("clear-answer"), explanationDialog: $("score-explanation"), explanationQuestion: $("score-explanation-question"), explanationSelection: $("score-explanation-selection"), explanationList: $("score-explanation-list"), closeExplanation: $("close-score-explanation"), scores: $("score-list"), completion: $("answered-count"), patientId: $("patient-id"), visitDate: $("visit-date"), birthYear: $("birth-year"), notes: $("visit-notes"), sessionFile: $("session-file"), category: $("rule-category"), question: $("rule-question"), answer: $("rule-answer"), weight: $("rule-weight"), categoryFilter: $("category-filter"), search: $("rule-search"), tableBody: $("rule-table-body"), addUpdate: $("add-update-rule"), deleteRule: $("delete-rule"), toast: $("toast")
+    list: $("question-list"), meta: $("question-meta"), answerState: $("answer-state"), prompt: $("question-prompt"), options: $("answer-options"), previous: $("previous-question"), next: $("next-question"), clearAnswer: $("clear-answer"), scores: $("score-list"), completion: $("answered-count"), categoryDialog: $("category-explanation"), categoryTitle: $("category-explanation-title"), categoryPoints: $("category-explanation-points"), categoryPercent: $("category-explanation-percent"), categoryContributions: $("category-contributions"), closeCategoryDialog: $("close-category-explanation"), patientId: $("patient-id"), visitDate: $("visit-date"), birthYear: $("birth-year"), notes: $("visit-notes"), sessionFile: $("session-file"), category: $("rule-category"), question: $("rule-question"), answer: $("rule-answer"), weight: $("rule-weight"), categoryFilter: $("category-filter"), search: $("rule-search"), tableBody: $("rule-table-body"), addUpdate: $("add-update-rule"), deleteRule: $("delete-rule"), toast: $("toast")
   };
   const escapeHtml = (value) => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
   const isAnswered = (question) => { const value = state.answers[question.id]; return Array.isArray(value) ? value.length > 0 : value !== undefined && value !== null && value !== ""; };
@@ -46,10 +46,7 @@
   function inputMarkup(question, value) {
     if (question.kind === "single" || question.kind === "multi") {
       const type = question.kind === "multi" ? "checkbox" : "radio";
-      return question.options.map((option) => {
-        const checked = question.kind === "multi" ? (value || []).includes(option) : value === option;
-        return `<div class="choice-row"><label class="choice"><input type="${type}" name="answer-${escapeHtml(question.id)}" value="${escapeHtml(option)}" ${checked ? "checked" : ""}><span>${escapeHtml(option)}</span></label><button class="option-effect-button" type="button" data-explain-answer="${escapeHtml(option)}" aria-label="View score effect for ${escapeHtml(option)}">View effect</button></div>`;
-      }).join("");
+      return question.options.map((option) => { const checked = question.kind === "multi" ? (value || []).includes(option) : value === option; return `<label class="choice"><input type="${type}" name="answer-${escapeHtml(question.id)}" value="${escapeHtml(option)}" ${checked ? "checked" : ""}><span>${escapeHtml(option)}</span></label>`; }).join("");
     }
     if (question.kind === "date") return `<input class="free-answer" type="date" value="${escapeHtml(value || "")}">`;
     if (question.kind === "numeric") return `<input class="free-answer" type="number" min="0" value="${escapeHtml(value ?? "")}" placeholder="Not answered">`;
@@ -64,24 +61,6 @@
     els.options.innerHTML = inputMarkup(question, state.answers[question.id]);
     els.previous.disabled = state.current === 0; els.next.disabled = state.current === visible.length - 1;
     renderQuestionList(); renderScores();
-  }
-  function explainAnswerEffect(answer) {
-    const question = currentQuestion(), targetAnswer = clean(answer);
-    if (!targetAnswer) return;
-    const impacts = Object.fromEntries(categories(state.rules).map((category) => [category, 0]));
-    state.rules.forEach((rule) => {
-      if (rule.questionId === question.id && normalized(rule.answer) === normalized(targetAnswer)) impacts[rule.category] = (impacts[rule.category] || 0) + rule.weight;
-    });
-    const ranked = Object.entries(impacts).sort(([categoryA, pointsA], [categoryB, pointsB]) =>
-      Math.abs(pointsB) - Math.abs(pointsA) || pointsB - pointsA || categoryA.localeCompare(categoryB, undefined, { sensitivity: "base" })
-    );
-    els.explanationQuestion.textContent = `Question ${question.id}: ${question.prompt}`;
-    els.explanationSelection.textContent = `Option being reviewed: ${targetAnswer}`;
-    els.explanationList.innerHTML = ranked.map(([category, points]) => {
-      const tone = points > 0 ? "positive" : points < 0 ? "negative" : "neutral";
-      return `<div class="impact-row"><span>${escapeHtml(category)}</span><strong class="impact-${tone}">${points > 0 ? "+" : ""}${Number(points).toFixed(3)} pts</strong></div>`;
-    }).join("");
-    els.explanationDialog.showModal();
   }
   function scoreAnswers() {
     const result = Object.fromEntries(categories(state.rules).map((category) => [category, { points: 0, available: 0, percent: 0 }]));
@@ -99,9 +78,29 @@
     const rankedScores = Object.entries(scores).sort(([categoryA, scoreA], [categoryB, scoreB]) =>
       scoreB.percent - scoreA.percent || scoreB.points - scoreA.points || categoryA.localeCompare(categoryB, undefined, { sensitivity: "base" })
     );
-    els.scores.innerHTML = rankedScores.map(([category, score]) => `<div class="score-row"><div class="score-label"><span>${escapeHtml(category)}</span><span><b>${score.percent.toFixed(1)}%</b><small>${score.points >= 0 ? "+" : ""}${score.points.toFixed(1)} pts</small></span></div><div class="score-track"><i class="${score.points < 0 ? "negative" : ""}" style="width:${score.percent}%"></i></div></div>`).join("");
+    els.scores.innerHTML = rankedScores.map(([category, score]) => `<button class="score-row score-button" type="button" data-score-category="${escapeHtml(category)}" aria-label="View score breakdown for ${escapeHtml(category)}"><span class="score-label"><span>${escapeHtml(category)}</span><span><b>${score.percent.toFixed(1)}%</b><small>${score.points >= 0 ? "+" : ""}${score.points.toFixed(1)} pts</small></span></span><span class="score-track"><i class="${score.points < 0 ? "negative" : ""}" style="width:${score.percent}%"></i></span></button>`).join("");
     const visible = visibleQuestions().filter((question) => question.kind !== "text");
     els.completion.textContent = `${visible.filter(isAnswered).length} of ${visible.length} answered`;
+  }
+  function showCategoryExplanation(category) {
+    const score = scoreAnswers()[category];
+    if (!score) return;
+    const questionOrder = new Map(questions.map((question, index) => [question.id, index]));
+    const contributions = state.rules.filter((rule) => {
+      if (rule.category !== category) return false;
+      const selected = new Set(answerValues(state.answers[rule.questionId]).map(normalized));
+      return selected.has(normalized(rule.answer));
+    }).sort((a, b) => (questionOrder.get(a.questionId) ?? Infinity) - (questionOrder.get(b.questionId) ?? Infinity));
+    els.categoryTitle.textContent = category;
+    els.categoryPoints.textContent = `${score.points >= 0 ? "+" : ""}${score.points.toFixed(3)} pts`;
+    els.categoryPoints.className = score.points > 0 ? "contribution-positive" : score.points < 0 ? "contribution-negative" : "contribution-neutral";
+    els.categoryPercent.textContent = `${score.percent.toFixed(1)}%`;
+    els.categoryContributions.innerHTML = contributions.length ? contributions.map((rule) => {
+      const question = questions.find((item) => item.id === rule.questionId);
+      const tone = rule.weight > 0 ? "positive" : rule.weight < 0 ? "negative" : "neutral";
+      return `<article class="contribution-row"><div><span class="contribution-id">Question ${escapeHtml(rule.questionId)}</span><h3>${escapeHtml(question?.prompt || "Unknown question")}</h3><p>Answer: <strong>${escapeHtml(rule.answer)}</strong></p></div><strong class="contribution-points contribution-${tone}">${rule.weight > 0 ? "+" : ""}${Number(rule.weight).toFixed(3)} pts</strong></article>`;
+    }).join("") : '<div class="no-contributions"><strong>No contributing answers yet.</strong><span>None of the answered questions currently add or subtract points for this category.</span></div>';
+    els.categoryDialog.showModal();
   }
   function setAnswerFromControl(target) {
     const question = currentQuestion();
@@ -175,10 +174,10 @@
   document.querySelectorAll(".tab").forEach((tab) => tab.addEventListener("click", () => { const target = tab.dataset.view; document.querySelectorAll(".tab").forEach((item) => { const active = item.dataset.view === target; item.classList.toggle("active", active); item.setAttribute("aria-selected", active); }); document.querySelectorAll(".view").forEach((view) => view.classList.remove("active")); $(`${target}-view`).classList.add("active"); }));
   els.list.addEventListener("click", (event) => { const button = event.target.closest("[data-index]"); if (button) { state.current = Number(button.dataset.index); renderQuestion(); } });
   els.options.addEventListener("change", (event) => setAnswerFromControl(event.target));
-  els.options.addEventListener("click", (event) => { const button = event.target.closest("[data-explain-answer]"); if (button) explainAnswerEffect(button.dataset.explainAnswer); });
   els.options.addEventListener("input", (event) => { if (event.target.matches(".free-answer")) setAnswerFromControl(event.target); });
-  els.closeExplanation.addEventListener("click", () => els.explanationDialog.close());
-  els.explanationDialog.addEventListener("click", (event) => { if (event.target === els.explanationDialog) els.explanationDialog.close(); });
+  els.scores.addEventListener("click", (event) => { const row = event.target.closest("[data-score-category]"); if (row) showCategoryExplanation(row.dataset.scoreCategory); });
+  els.closeCategoryDialog.addEventListener("click", () => els.categoryDialog.close());
+  els.categoryDialog.addEventListener("click", (event) => { if (event.target === els.categoryDialog) els.categoryDialog.close(); });
   els.previous.addEventListener("click", () => { state.current = Math.max(0, state.current - 1); renderQuestion(); });
   els.next.addEventListener("click", () => { state.current = Math.min(visibleQuestions().length - 1, state.current + 1); renderQuestion(); });
   els.clearAnswer.addEventListener("click", () => { delete state.answers[currentQuestion().id]; questions.filter((item) => item.showWhen && !conditionMet(item)).forEach((item) => delete state.answers[item.id]); renderQuestion(); });

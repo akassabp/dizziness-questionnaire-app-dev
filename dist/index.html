@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Development environment for the Nebula dizziness questionnaire scoring platform." />
-  <title>Nebula Questionnaire — Development</title>
-  <link rel="stylesheet" href="styles.css?v=dev-2" />
+  <meta name="description" content="Nebula dizziness questionnaire scoring platform." />
+  <title>Nebula Questionnaire Scoring Platform</title>
+  <link rel="stylesheet" href="styles.css?v=dev-breakdown-1" />
 </head>
 <body class="auth-locked">
   <section id="access-gate" class="access-gate" aria-labelledby="access-title">
     <form id="access-form" class="access-card">
-      <p class="eyebrow">Dizziness classification project <span class="dev-badge">Development</span></p>
+      <p class="eyebrow">Dizziness classification project</p>
       <h1 id="access-title">Nebula Questionnaire</h1>
       <p>Enter the project access code and press Enter.</p>
       <label for="access-code">Access code</label>
@@ -22,7 +22,7 @@
     <main>
       <section id="questionnaire-view" class="view active">
         <header class="view-header">
-          <div class="title-with-badge"><h1>Nebula Questionnaire</h1><span class="dev-badge">Development</span></div>
+          <div><h1>Nebula Questionnaire</h1></div>
           <nav class="tabs" aria-label="Application views">
             <button class="tab active" data-view="questionnaire" aria-selected="true">Questionnaire</button>
             <button class="tab" data-view="configuration" aria-selected="false">Model Configuration</button>
@@ -39,8 +39,7 @@
           <aside class="question-list-panel panel"><div id="question-list" class="question-list"></div></aside>
           <section class="question-panel panel">
             <div class="question-status"><strong id="question-meta"></strong><span id="answer-state">Not answered</span></div>
-            <h2 id="question-prompt"></h2>
-            <div id="answer-options" class="answer-options"></div>
+            <h2 id="question-prompt"></h2><div id="answer-options" class="answer-options"></div>
             <div class="question-controls"><button id="previous-question">Previous</button><button id="clear-answer">Clear answer</button><span></span><button id="next-question" class="primary">Next</button></div>
           </section>
           <aside class="score-panel panel"><h2>Current category support</h2><p>These are rule-based screening scores, not diagnoses.</p><div id="score-list"></div><div id="answered-count" class="completion"></div></aside>
@@ -48,7 +47,7 @@
       </section>
       <section id="configuration-view" class="view">
         <header class="view-header">
-          <div><div class="title-with-badge"><h1>Model Configuration</h1><span class="dev-badge">Development</span></div><p>Edit exactly how each answer adds or subtracts category evidence</p></div>
+          <div><h1>Model Configuration</h1><p>Edit exactly how each answer adds or subtracts category evidence</p></div>
           <nav class="tabs" aria-label="Application views">
             <button class="tab" data-view="questionnaire" aria-selected="false">Questionnaire</button>
             <button class="tab active" data-view="configuration" aria-selected="true">Model Configuration</button>
@@ -77,17 +76,22 @@
       </section>
     </main>
   </div>
-  <dialog id="score-explanation" class="score-dialog" aria-labelledby="score-explanation-title">
-    <div class="dialog-header">
-      <div><p class="eyebrow">Option impact preview</p><h2 id="score-explanation-title">How this option affects scores</h2></div>
-      <button id="close-score-explanation" type="button" aria-label="Close scoring explanation">Close</button>
+  <dialog id="category-explanation" class="category-explanation" aria-labelledby="category-explanation-title">
+    <div class="category-panel-header">
+      <div><p class="eyebrow">Score breakdown</p><h2 id="category-explanation-title"></h2></div>
+      <button id="close-category-explanation" type="button" aria-label="Close score breakdown">Close</button>
     </div>
-    <p id="score-explanation-question" class="dialog-question"></p>
-    <p id="score-explanation-selection" class="dialog-selection"></p>
-    <div id="score-explanation-list" class="impact-list"></div>
-    <p class="dialog-note">These are rule-based point changes from the active model configuration. They are not a diagnosis.</p>
+    <div class="category-panel-summary">
+      <div><span>Total points</span><strong id="category-explanation-points"></strong></div>
+      <div><span>Current support</span><strong id="category-explanation-percent"></strong></div>
+    </div>
+    <div class="category-panel-body">
+      <p>Answers currently contributing to this category:</p>
+      <div id="category-contributions" class="category-contributions"></div>
+    </div>
+    <p class="category-panel-note">This is a transparent breakdown of the active rule-based model, not a diagnosis.</p>
   </dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="questionnaire-data.js?v=km2-3"></script><script src="app.js?v=dev-2"></script>
+  <script src="questionnaire-data.js?v=km2-3"></script><script src="app.js?v=dev-breakdown-1"></script>
 </body>
 </html>

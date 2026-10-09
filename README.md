@@ -1,9 +1,6 @@
-# Nebula Questionnaire Web App — Development
+# Nebula Questionnaire Web App
 
-Experimental version of the configurable Nebula dizziness questionnaire. Changes are tested here before they are considered for the production site.
-
-- Development site: https://akassabp.github.io/dizziness-questionnaire-app-dev/
-- Production site: https://akassabp.github.io/dizziness-questionnaire-app/
+Static web version of the configurable Nebula dizziness questionnaire.
 
 Public site access uses an access-code screen. Entering the code and pressing Enter opens the desktop-style questionnaire.
 
@@ -14,7 +11,6 @@ Public site access uses an access-code screen. Entering the code and pressing En
 - Applies the KM2 negative-evidence calibration: low = half an evidence unit, standard = one unit, strong = two units (capped at 100), and explicit rule-out = -100 points.
 - Allows experts to add, edit, remove, and reorder questions and answers.
 - Supports both single-choice and checklist questions.
-- Adds a per-option “View effect” button that shows the answer's exact point impact without selecting it, using the active model configuration.
 - Allows any answer to carry a 0–100 weight for any diagnostic class.
 - Allows diagnostic classes to be added or removed.
 - Imports and exports the complete configuration as JSON.
